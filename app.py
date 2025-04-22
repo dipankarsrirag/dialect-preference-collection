@@ -402,7 +402,7 @@ def question_page():
 
     # Add logout button to the top of the page
     add_logout_button()
-    
+
     # Initialize question index if not set
     if "question_index" not in st.session_state:
         if len(responses) < len(questions):
@@ -413,7 +413,7 @@ def question_page():
     # Create a sidebar with navigation options
     with st.sidebar:
         st.title("Navigation")
-        
+
         # User info
         st.info(f"Logged in as: {username}")
 
@@ -497,10 +497,10 @@ def question_page():
             st.warning("Question Status: Not Answered")
 
         # Display the question
-        st.markdown("### Original Sentence")
+        st.markdown("### Text written in standard variety of English")
         st.markdown(f"**{question['sentence']}**")
 
-        st.markdown("### Which alternative do you prefer?")
+        st.markdown("### Following are the texts written in Indian variety of English.")
 
         # Default value from previous response if it exists
         default_option = 0
@@ -512,7 +512,7 @@ def question_page():
         # Create a form for input
         with st.form(key=f"question_form_{current_index}"):
             selected_option = st.radio(
-                "Select one option:",
+                "Select the text that you consider to be a true dialectal alternative to the original text:",
                 options=[question["option1"], question["option2"]],
                 index=default_option - 1 if default_option > 0 else None,
             )
@@ -521,7 +521,7 @@ def question_page():
                 "How confident are you in your choice?",
                 min_value=1,
                 max_value=5,
-                value=default_confidence,
+                value=1,
                 step=1,
                 help="1 = Low confidence, 5 = High confidence",
             )
@@ -563,7 +563,7 @@ def summary_page():
 
     # Add logout button to the top of the page
     add_logout_button()
-    
+
     st.title("Progress Summary")
 
     # Progress stats
@@ -670,9 +670,9 @@ def summary_page():
 def admin_page():
     # Add logout button to the top of the page
     add_logout_button()
-    
+
     st.title("Admin Panel - Preference Data Collector")
-    st.info(f"Logged in as: admin")
+    st.info("Logged in as: admin")
 
     tab1, tab2, tab3 = st.tabs(["Users", "Export Data", "Statistics"])
 
