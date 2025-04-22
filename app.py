@@ -334,6 +334,21 @@ def get_statistics():
     }
 
 
+# Function to clear session state
+def clear_session_state():
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+
+
+# Add a logout button to the top navigation
+def add_logout_button():
+    col1, col2 = st.columns([6, 1])
+    with col2:
+        if st.button("🚪 Logout", key="top_logout"):
+            clear_session_state()
+            st.rerun()
+
+
 # Main Streamlit UI functions
 def login_page():
     st.title("Preference Data Collector")
@@ -356,7 +371,6 @@ def login_page():
                     st.session_state.username = username
                     st.session_state.is_admin = username == "admin"
                     st.success(message)
-                    # Replace experimental_rerun with rerun
                     st.rerun()
                 else:
                     st.error(message)
@@ -386,6 +400,9 @@ def question_page():
     questions = load_questions()
     responses = load_responses(username)
 
+    # Add logout button to the top of the page
+    add_logout_button()
+    
     # Initialize question index if not set
     if "question_index" not in st.session_state:
         if len(responses) < len(questions):
@@ -396,6 +413,9 @@ def question_page():
     # Create a sidebar with navigation options
     with st.sidebar:
         st.title("Navigation")
+        
+        # User info
+        st.info(f"Logged in as: {username}")
 
         # Calculate progress
         answered_count = len(responses)
@@ -414,25 +434,21 @@ def question_page():
         with col1:
             if st.button("⏪ First"):
                 st.session_state.question_index = 0
-                # Replace experimental_rerun with rerun
                 st.rerun()
 
             if st.button("◀ Previous"):
                 if st.session_state.question_index > 0:
                     st.session_state.question_index -= 1
-                    # Replace experimental_rerun with rerun
                     st.rerun()
 
         with col2:
             if st.button("Next ▶"):
                 if st.session_state.question_index < len(questions) - 1:
                     st.session_state.question_index += 1
-                    # Replace experimental_rerun with rerun
                     st.rerun()
 
             if st.button("Last ⏩"):
                 st.session_state.question_index = len(questions) - 1
-                # Replace experimental_rerun with rerun
                 st.rerun()
 
         # Jump to question
@@ -440,21 +456,17 @@ def question_page():
         jump_to = st.number_input("", min_value=1, max_value=len(questions), step=1)
         if st.button("Go"):
             st.session_state.question_index = jump_to - 1
-            # Replace experimental_rerun with rerun
             st.rerun()
 
         # Show progress summary button
         if st.button("View Progress Summary"):
             st.session_state.show_summary = True
-            # Replace experimental_rerun with rerun
             st.rerun()
 
-        # Logout button
+        # Sidebar logout button with more prominence
         st.write("---")
-        if st.button("Logout"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            # Replace experimental_rerun with rerun
+        if st.button("🚪 Logout", type="primary"):
+            clear_session_state()
             st.rerun()
 
     # Show summary page if needed
@@ -537,7 +549,6 @@ def question_page():
                 # Auto-navigate to next question if not the last one
                 if current_index < len(questions) - 1:
                     st.session_state.question_index += 1
-                    # Replace experimental_rerun with rerun
                     st.rerun()
                 else:
                     st.info("You've reached the last question!")
@@ -550,6 +561,9 @@ def summary_page():
     questions = load_questions()
     responses = load_responses(username)
 
+    # Add logout button to the top of the page
+    add_logout_button()
+    
     st.title("Progress Summary")
 
     # Progress stats
@@ -622,7 +636,6 @@ def summary_page():
                 if cols[col_idx].button(f"{status} Q{q_num}", key=f"goto_{q_idx}"):
                     st.session_state.question_index = q_idx
                     st.session_state.show_summary = False
-                    # Replace experimental_rerun with rerun
                     st.rerun()
 
     # Export button
@@ -642,15 +655,24 @@ def summary_page():
         else:
             st.error(f"Failed to export results: {result}")
 
-    # Back button
-    if st.button("Back to Questions"):
-        st.session_state.show_summary = False
-        # Replace experimental_rerun with rerun
-        st.rerun()
+    # Two buttons with equal prominence: Back to Questions and Logout
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Back to Questions", type="primary"):
+            st.session_state.show_summary = False
+            st.rerun()
+    with col2:
+        if st.button("🚪 Logout", key="bottom_logout", type="primary"):
+            clear_session_state()
+            st.rerun()
 
 
 def admin_page():
+    # Add logout button to the top of the page
+    add_logout_button()
+    
     st.title("Admin Panel - Preference Data Collector")
+    st.info(f"Logged in as: admin")
 
     tab1, tab2, tab3 = st.tabs(["Users", "Export Data", "Statistics"])
 
@@ -692,7 +714,6 @@ def admin_page():
                 success, message = delete_user(delete_username)
                 if success:
                     st.success(message)
-                    # Replace experimental_rerun with rerun
                     st.rerun()
                 else:
                     st.error(message)
@@ -749,10 +770,16 @@ def admin_page():
 
             st.bar_chart(chart_data.set_index("Username"))
 
-        # Refresh button
-        if st.button("Refresh Statistics"):
-            # Replace experimental_rerun with rerun
-            st.rerun()
+        # Admin actions at the bottom
+        st.write("---")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Refresh Statistics", type="primary"):
+                st.rerun()
+        with col2:
+            if st.button("🚪 Logout", key="admin_bottom_logout", type="primary"):
+                clear_session_state()
+                st.rerun()
 
 
 # Main app logic
