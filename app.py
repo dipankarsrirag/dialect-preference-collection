@@ -17,7 +17,7 @@ st.set_page_config(
 # File paths and directories
 DATA_DIR = "user_data"
 USERS_FILE = "users.json"
-QUESTIONS_FILE = "questions.csv"
+QUESTIONS_FILE = "./data/questions.csv"
 
 # Create data directory if it doesn't exist
 os.makedirs(DATA_DIR, exist_ok=True)
